@@ -26,11 +26,10 @@ make a symbolic link to point to our driver directory in rza2m_drp package.
 
 	$ cd rza_linux-4.19_bsp
 
-Create a symbolic link under the 'driver' directory in the kernel
-	$ cd output/linux-4.19
-	$ cd driver
+Create a symbolic link under the 'drivers' directory in the kernel
+	$ cd output/linux-4.19/drivers
 	$ ln -s ../../../rza2m_drp_dev/driver/drp
-	$ cd ..
+	$ cd ..                                          # back up to the kernel directory
 	
 Now we will patch the kernel to add our driver (add to menuconfig)
 	$ patch -p1 -i ../../rza2m_drp/kernel_patch/*.patch
