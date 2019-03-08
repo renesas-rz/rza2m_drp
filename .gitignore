@@ -1,0 +1,9 @@
+*.o
+*.a
+*.cmd
+*.dtb
+*.ko
+*.so
+*.bin
+DRP_sample/DRP_sample
+drp-lib/drplib-config-api.h

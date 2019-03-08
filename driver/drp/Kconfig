@@ -1,0 +1,4 @@
+config DRP
+        tristate "RZ/A2M DRP driver"
+        help
+          DRP driver for RZ/A2M
