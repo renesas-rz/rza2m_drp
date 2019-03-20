@@ -82,8 +82,9 @@ strip:
 	$(CROSS_COMPILE)strip --strip-debug $(app)
 
 install:
-	@# Copy to Buildroot overlay directory (only for Renesas BSP)
-	cp $(app) $(BUILDROOT_DIR)/output/target/drp
+	@# Copy to Buildroot overlay directory (only if using the Renesas BSP)
+	mkdir -p $(BUILDROOT_DIR)/output/target/root/drp
+	cp $(app) $(BUILDROOT_DIR)/output/target/root/drp
 	@echo ''
 	@echo 'Please run Buildroot again to repackage the rootfs image.'
 
