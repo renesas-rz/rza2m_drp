@@ -28,7 +28,7 @@ make a symbolic link to point to our driver directory in rza2m_drp package.
 
 Create a symbolic link under the 'drivers' directory in the kernel
 	$ cd output/linux-4.19/drivers
-	$ ln -s ../../../rza2m_drp_dev/driver/drp
+	$ ln -s ../../../rza2m_drp/driver/drp
 	$ cd ..                                          # back up to the kernel directory
 	
 Now we will patch the kernel to add our driver (add to menuconfig)
@@ -94,7 +94,7 @@ API calls for RTOS systems in your Linux application.
 Also, you can select what DRP images you plan to use in your application by
 editing the file "config_flash_create.sh"
 
-By defualt, the config_flash_create.sh is already configured for the DRP
+By default, the config_flash_create.sh is already configured for the DRP
 demo that is included in this package.
 
 	$ cd rza_linux-4.19_bsp
@@ -117,6 +117,15 @@ Program this binary image into QSPI flash (at the last 4MB of QSPI flash area)
 
 	$ ./config_flash_program.sh
 
+Build the API library that will be used by the user application.
+A libdrp.a library will be created for your user application to statically link
+against. This is the recommended method. Also, a libdrp.so runtime library is
+created that can be copied to the target file system for your user application to
+dynamically  link against at runtime. By default, the demo application's Makefile
+will statically link against the libdrp.a library, so copying the libdrp.so file
+is not required to run the demo.
+
+	$ make
 
 ================================================================================
 Build the Demo
