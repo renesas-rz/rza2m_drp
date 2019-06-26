@@ -2426,12 +2426,12 @@ int main(int argc, char **argv)
 		/* Configure Layer for CLUT8 to display the camera */
 		sprintf(image_buffer,	"echo \"xres = 800 , yres = 480 , x_offset = 0 , y_offset = 0 , "
 					"base = 0x%08X , bpp = 8 , format = CLUT8 , read_swap = swap_32_16_8 , blend = 0\" "
-					" > /sys/devices/platform/fcff7400.display/layer%d", CAMERA_FB_ADDR, VDC_LAYER_CAMERA);
+					" > /sys/devices/platform/soc/fcff7400.display/layer%d", CAMERA_FB_ADDR, VDC_LAYER_CAMERA);
 	}
 	else
 	{
 		/* Hide layer */
-		sprintf(image_buffer,	"echo \"xres = 0 \" > /sys/devices/platform/fcff7400.display/layer%d", VDC_LAYER_CAMERA);
+		sprintf(image_buffer,	"echo \"xres = 0 \" > /sys/devices/platform/soc/fcff7400.display/layer%d", VDC_LAYER_CAMERA);
 	}
 	system(image_buffer);
 
@@ -2441,12 +2441,12 @@ int main(int argc, char **argv)
 		// NOTE: We have to use 768 instead of 800 because for CLUT4, the number of bytes for each line must be exactly divisible by 32
 		sprintf(image_buffer,	"echo \"xres = 768 , yres = 480 , x_offset = 0 , y_offset = 0 , " \
 					"base = 0%08X , bpp = 4 , format = CLUT4 , read_swap = swap_32_16_8 , blend = 1\" " \
-					" > /sys/devices/platform/fcff7400.display/layer%d", OVERLAY_FB_ADDR, VDC_LAYER_OVERLAY);
+					" > /sys/devices/platform/soc/fcff7400.display/layer%d", OVERLAY_FB_ADDR, VDC_LAYER_OVERLAY);
 	}
 	else
 	{
 		/* Hide layer */
-		sprintf(image_buffer,	"echo \"xres = 0 \" > /sys/devices/platform/fcff7400.display/layer%d", VDC_LAYER_OVERLAY);
+		sprintf(image_buffer,	"echo \"xres = 0 \" > /sys/devices/platform/soc/fcff7400.display/layer%d", VDC_LAYER_OVERLAY);
 	}
 	system(image_buffer);
 
@@ -2461,7 +2461,7 @@ int main(int argc, char **argv)
 	// the Alpha is 0% (transparent) so just let the lower layer show
 	// through
 	sprintf(image_buffer,	"echo layer%d = 0x00000000 to 0x00000000 > "\
-				"/sys/devices/platform/fcff7400.display/color_replace", VDC_LAYER_OVERLAY);
+				"/sys/devices/platform/soc/fcff7400.display/color_replace", VDC_LAYER_OVERLAY);
 	system(image_buffer);
 
 	/* Map our frame buffer layer to display the camera to userspace */
