@@ -815,7 +815,6 @@
 		address-width = <8>;
 	};
 };
-#endif
 
 &dma0  {
 		/*slave id for another device*/
@@ -832,3 +831,4 @@
 			0x2 0xb5>;
 };
 
+#endif
