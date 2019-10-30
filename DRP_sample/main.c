@@ -1871,6 +1871,25 @@ void DRP_app_processing(void)
 	struct timeval tv1,tv2,tv3;
 	int fps;
 	int time_loop;
+	int retval;
+	uint32_t *V0MS;
+	void *VIN_base;
+	uint32_t V0MS_FBS;
+	uint8_t fbs_back = 0;
+	uint8_t buff_write_point = 1;
+	uint32_t MIPI_buf_addr[2];
+	void *MIPI_map_buf_addr[2];
+	uint8_t buff_1, buff_2, buff_3;
+
+	MIPI_buf_addr[0] = MIPI_BUFF_A_ADDR;
+	MIPI_buf_addr[1] = MIPI_BUFF_B_ADDR;
+
+	MIPI_map_buf_addr[0] = mipi_buffer_a;
+	MIPI_map_buf_addr[1] = mipi_buffer_b;
+
+	buff_1 = 0;
+	buff_2 = 1;
+	buff_3 = 0;
 
 	if (ceu_input)
 	{
@@ -1879,7 +1898,7 @@ void DRP_app_processing(void)
 	}
 
 	while(1)
-	{ 
+	{
 		gettimeofday(&tv_loop1, NULL);	/* START TIME */
 
 		/* clear out all the time stamps */
@@ -1888,19 +1907,37 @@ void DRP_app_processing(void)
 
 		if (mipi_input)
 		{
+			while (1) {
+				VIN_base = mmap(NULL, 0x8, PROT_READ | PROT_WRITE, MAP_SHARED, mem_fd, 0xe803f000);
+				V0MS = (uint32_t *)(VIN_base + 0x4);
+				V0MS_FBS = (*V0MS & 0x18) >> 3;
+				if (V0MS_FBS != fbs_back && V0MS_FBS != 3) {
+					munmap(VIN_base,0x8);
+					break;
+				}
+				munmap(VIN_base,0x8);
+			}
+			fbs_back = V0MS_FBS;
+
 			gettimeofday(&tv1, NULL);	/* START TIME */
 
-			/* Copy mipi output buffer into DRP input buffer  */
-			if(buffer_no == 0)
-			{
-				memcpy(image_buffer, mipi_buffer_a, CAP_WIDTH*CAP_HEIGHT);
-				buffer_no = 1;
+			if (fbs_back == 0) {
+				memcpy(image_buffer, MIPI_map_buf_addr[buff_1], CAP_WIDTH*CAP_HEIGHT);
+				retval = R_MIPI_SetBufferAdr(0, MIPI_buf_addr[buff_write_point]);
+				buff_1 = buff_write_point;
 			}
-			else
-			{
-				memcpy(image_buffer, mipi_buffer_b, CAP_WIDTH*CAP_HEIGHT);
-				buffer_no = 0;
+			else if (fbs_back == 1) {
+				memcpy(image_buffer, MIPI_map_buf_addr[buff_2], CAP_WIDTH*CAP_HEIGHT);
+				retval = R_MIPI_SetBufferAdr(1, MIPI_buf_addr[buff_write_point]);
+				buff_2 = buff_write_point;
 			}
+			else {
+				memcpy(image_buffer, MIPI_map_buf_addr[buff_3], CAP_WIDTH*CAP_HEIGHT);
+				retval = R_MIPI_SetBufferAdr(2, MIPI_buf_addr[buff_write_point]);
+				buff_3 = buff_write_point;
+			}
+
+			buff_write_point ^= 1;
 
 			gettimeofday(&tv2, NULL);	/* STOP TIME */
 			timeval_subtract(&tv3,&tv2,&tv1);
@@ -2346,7 +2383,7 @@ int main(int argc, char **argv)
 		/* Set the address of our capture buffer */
 		retval = R_MIPI_SetBufferAdr(0, MIPI_BUFF_A_ADDR);
 		retval = R_MIPI_SetBufferAdr(1, MIPI_BUFF_B_ADDR);
-		retval = R_MIPI_SetBufferAdr(2, MIPI_BUFF_B_ADDR);
+		retval = R_MIPI_SetBufferAdr(2, MIPI_BUFF_A_ADDR);
 
 		/* Set the capture mode */
 		retval = R_MIPI_SetMode(1); /* 0: single mode, 1 continuous mode */
